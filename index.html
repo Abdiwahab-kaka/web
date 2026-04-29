@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HANAQAAD ACADEMY | Online Learning</title>
+    
+    <!-- Tailwind CSS for Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="Styles.css">
+</head>
+<body class="bg-gray-50 text-gray-800 relative">
+
+    <!-- NAVIGATION BAR -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+                <i class="fas fa-graduation-cap"></i> HANAQAAD-ACADEMEY</span>
+            </a>
+
+            <!-- Desktop Menu (Removed Tests link) -->
+            <div class="hidden md:flex space-x-4 items-center">
+                <a href="#home" class="text-gray-700 hover:text-blue-600 font-medium transition">Home</a>
+                <a href="#courses" class="text-gray-700 hover:text-blue-600 font-medium transition">Courses</a>
+                
+                <!-- Student Login Button moved to Header -->
+                <button onclick="openStudentLoginModal()" class="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-full hover:bg-blue-100 transition font-medium">
+                    Student Login
+                </button>
+                
+                <a href="#enroll" class="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition shadow-lg font-medium">Enroll Now</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-gray-700 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown (Removed Tests link) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t p-4 flex flex-col space-y-4 shadow-lg">
+            <a href="#home" class="block text-gray-700 hover:text-blue-600">Home</a>
+            <a href="#courses" class="block text-gray-700 hover:text-blue-600">Courses</a>
+            <button onclick="openStudentLoginModal()" class="block text-blue-600 font-bold text-left">Student Login</button>
+            <a href="#enroll" class="block text-blue-600 font-bold">Enroll Now</a>
+        </div>
+    </nav>
+
+    <!-- ADMIN DASHBOARD (Hidden by default) -->
+    <div id="admin-dashboard" class="hidden fixed inset-0 bg-gray-100 z-[60] overflow-y-auto">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800"><i class="fas fa-user-shield text-blue-600"></i> Admin Dashboard</h1>
+                <button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Logout</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- SECTION 1: Manage Courses -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold mb-4 border-b pb-2">Manage Courses</h2>
+                    
+                    <!-- Add/Edit Course Form -->
+                    <form id="course-form" class="mb-6 bg-gray-50 p-4 rounded border">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 id="form-title" class="font-semibold text-sm text-gray-600">Add New Course</h3>
+                            <button type="button" id="cancel-edit-btn" onclick="cancelEditMode()" class="hidden text-xs text-red-500 hover:underline">Cancel Edit</button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <input type="text" id="course-title" placeholder="Course Title" class="p-2 border rounded text-sm w-full" required>
+                            <input type="text" id="course-image" placeholder="Image URL" class="p-2 border rounded text-sm w-full" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" id="course-desc" placeholder="Short Description" class="p-2 border rounded text-sm w-full" required>
+                        </div>
+                        
+                        <!-- VIDEO UPLOAD SECTION -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="text-sm font-medium text-gray-700">Course Videos</label>
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="switchVideoMethod('url')" id="btn-url-method" class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700">
+                                        <i class="fas fa-link mr-1"></i>Add URL
+                                    </button>
+                                    <button type="button" onclick="switchVideoMethod('upload')" id="btn-upload-method" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-300">
+                                        <i class="fas fa-upload mr-1"></i>Upload File
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- URL Method (Default) -->
+                            <div id="video-url-method">
+                                <div id="video-fields-container">
+                                    <div class="flex gap-2 mb-2">
+                                        <input type="text" class="video-url-input p-2 border rounded text-sm w-full" placeholder="YouTube Embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)" required>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" onclick="addVideoField()" class="text-xs bg-blue-100 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-200 mt-2">
+                                        <i class="fas fa-plus mr-1"></i>Add Another Video URL
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Method -->
+                            <div id="video-upload-method" class="hidden">
+                                <div id="upload-fields-container">
+                                    <div class="upload-area p-6 text-center mb-4 cursor-pointer" onclick="document.getElementById('video-file-0').click()" ondrop="handleDrop(event, 0)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                        <input type="file" id="video-file-0" class="hidden" accept="video/*" onchange="handleFileSelect(event, 0)">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                                        <p class="text-sm text-gray-600 mb-1">Click to browse or drag & drop video file</p>
+                                        <p class="text-xs text-gray-500">Supported: MP4, WebM, OGG (Max: 100MB)</p>
+                                    </div>
+                                    <div class="file-info hidden" id="file-info-0">
+                                        <div class="bg-green-50 border border-green-200 rounded p-3 flex justify-between items-center">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-file-video text-green-500 mr-2"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-800" id="file-name-0"></p>
+                                                    <p class="text-xs text-gray-500" id="file-size-0"></p>
+                                                </div>
+                                            </div>
+                                            <button type="button" onclick="removeUploadedFile(0)" class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between mt-3">
+                                    <button type="button" onclick="addUploadField()" class="text-xs bg-green-100 text-green-600 px-3 py-1.5 rounded hover:bg-green-200">
+                                        <i class="fas fa-plus mr-1"></i>Add Another Video File
+                                    </button>
+                                    <div class="text-xs text-gray-500">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Videos will be stored temporarily
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Method Indicator -->
+                            <div class="mt-4 pt-3 border-t">
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <span id="current-method-indicator">Current method: Adding video URLs</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="form-submit-btn" class="bg-green-600 text-white text-sm px-4 py-2 rounded hover:bg-green-700 w-full font-bold transition">Add Course</button>
+                    </form>
+
+                    <!-- Course List (Delete/Edit) -->
+                    <div class="overflow-y-auto max-h-96">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-sm text-gray-600">
+                                    <th class="p-2">Title</th>
+                                    <th class="p-2 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-course-list">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Student Enrollments -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-bold mb-4 border-b pb-2">Student Enrollments</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-sm text-gray-600">
+                                    <th class="p-2">Name</th>
+                                    <th class="p-2">Course</th>
+                                    <th class="p-2">Status</th>
+                                    <th class="p-2 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-enrollment-list">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="no-enrollments-msg" class="text-center text-gray-500 py-4 hidden">No pending enrollments.</p>
+                </div>
+
+            </div>
+            
+            <button onclick="closeAdminPanel()" class="mt-8 text-gray-500 hover:text-gray-800 underline">Back to Website Preview</button>
+        </div>
+    </div>
+
+    <!-- STUDENT DASHBOARD (Hidden by default) -->
+    <div id="student-dashboard" class="hidden fixed inset-0 bg-gray-50 z-[60] overflow-y-auto">
+        <!-- Top Bar -->
+        <div class="bg-white shadow-md p-4 sticky top-0 z-10">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-graduation-cap text-blue-600 text-2xl"></i>
+                    <span class="font-bold text-xl text-gray-800">My Classroom</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="student-name-display" class="font-medium text-gray-600">Student</span>
+                    <button onclick="logoutStudent()" class="bg-red-500 text-white px-4 py-1.5 rounded text-sm hover:bg-red-600">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-6 py-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">My Enrolled Courses</h2>
+            
+            <!-- Student Course List -->
+            <div id="student-course-list" class="space-y-8">
+                <!-- Courses injected here -->
+            </div>
+            
+            <div id="no-access-msg" class="hidden text-center py-10">
+                <i class="fas fa-lock text-gray-300 text-6xl mb-4"></i>
+                <p class="text-xl text-gray-500">You don't have any active courses yet.</p>
+                <p class="text-gray-400">Please wait for admin approval.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div id="main-content">
+        <!-- HERO SECTION - REDESIGNED -->
+        <section id="home" class="relative overflow-hidden pt-16">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50"></div>
+            
+            <!-- Animated Background Shapes -->
+            <div class="absolute top-20 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div class="absolute bottom-20 right-10 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse delay-1000"></div>
+            
+            <div class="relative container mx-auto px-6 py-20 lg:py-32">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Left Content -->
+                    <div class="text-center lg:text-left">
+                        <!-- Badge -->
+                        <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full mb-6">
+                            <span class="w-2 h-2 bg-blue-600 rounded-full animate-ping"></span>
+                            <span class="font-semibold text-sm">🎓 Trusted by 5,000+ Students</span>
+                        </div>
+                        
+                        <!-- Main Heading -->
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                            Learn From
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                                Industry Experts
+                            </span>
+                            <br>
+                            <span class="text-3xl md:text-4xl lg:text-5xl">Build Your Future</span>
+                        </h1>
+                        
+                        <!-- Description -->
+                        <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl">
+                            Master in-demand skills with our comprehensive online courses. 
+                            Get certified, build projects, and launch your career with hands-on learning.
+                        </p>
+                        
+                        <!-- Stats -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                            <div class="text-center lg:text-left">
+                                <div class="text-3xl font-bold text-blue-600 mb-1">50+</div>
+                                <div class="text-sm text-gray-500">Expert Courses</div>
+                            </div>
+                            <div class="text-center lg:text-left">
+                                <div class="text-3xl font-bold text-purple-600 mb-1">5K+</div>
+                                <div class="text-sm text-gray-500">Students Enrolled</div>
+                            </div>
+                            <div class="text-center lg:text-left">
+                                <div class="text-3xl font-bold text-green-600 mb-1">98%</div>
+                                <div class="text-sm text-gray-500">Satisfaction Rate</div>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                            <a href="#enroll" 
+                               class="group relative bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                                <span class="relative z-10">Start Education  Now</span>
+                                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </a>
+                            <a href="#courses" 
+                               class="group border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-blue-500 hover:text-blue-600 transition-all duration-300">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fas fa-play-circle"></i>
+                                    View Courses
+                                </span>
+                            </a>
+                        </div>
+                        
+                        <!-- Trust Indicators -->
+                        <div class="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500">
+                            <div class="flex items-center gap-2">
+                                <div class="flex -space-x-2">
+                                    <img class="w-8 h-8 rounded-full border-2 border-white" src="h.jpg" alt="Student">
+                                    <img class="w-8 h-8 rounded-full border-2 border-white" src="h.jpg" alt="Student">
+                                    <img class="w-8 h-8 rounded-full border-2 border-white" src="h.jpg" alt="Student">
+                                </div>
+                                <span>Join 5,000+ successful students</span>
+                            </div>
+                         
+                        </div>
+                    </div>
+                    
+                    <!-- Right Content - Hero Image/Card -->
+                    <div class="relative">
+                        <!-- Main Card -->
+                        <div class="relative bg-white rounded-2xl shadow-2xl overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                            <img src="h.jpg" 
+                                 alt="Students Learning"
+                                 class="w-full h-64 object-cover">
+                            
+                            <!-- Course Badge -->
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                                <span class="font-bold text-blue-600">🔥 Trending Course</span>
+                            </div>
+                            
+                            <!-- Card Content -->
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="font-bold text-xl text-gray-900">Full Stack Development</h3>
+                                        <p class="text-gray-600 text-sm">By PR.HANAD-AZIIZ</p>
+                                    </div>
+                                    <div class="text-yellow-500">
+                                        <i class="fas fa-star"></i>
+                                        <span class="font-bold ml-1">4.9</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock text-blue-500"></i>
+                                        <span class="text-sm text-gray-600">12 Weeks</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-video text-purple-500"></i>
+                                        <span class="text-sm text-gray-600">24 Videos</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                    <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full w-3/4"></div>
+                                </div>
+                                
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>75% Complete</span>
+                                    <span>1,234 Students</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Elements -->
+                        <div class="absolute -top-6 -right-6 bg-white p-4 rounded-xl shadow-lg border border-gray-100 animate-bounce">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">📈</div>
+                                <div class="text-xs font-bold text-gray-700">Career Growth</div>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">🎯</div>
+                                <div class="text-xs font-bold text-gray-700">Job Ready</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <a href="#courses" class="text-gray-400 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-chevron-down text-2xl"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- COURSES SECTION -->
+        <section id="courses" class="py-20 container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Premium Courses</h2>
+                <div class="w-24 h-1 bg-blue-600 mx-auto rounded"></div>
+                <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Explore our wide range of disciplines. Each course comes with video tutorials, comprehensive materials, and certification.</p>
+            </div>
+
+            <!-- Course Grid (Populated via JS) -->
+            <div id="course-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Courses will be injected here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- ENROLLMENT SECTION -->
+        <section id="enroll" class="py-20 bg-blue-50">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col lg:flex-row gap-12 items-center">
+                    
+                    <!-- Info Side -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Join Hanaqaad Academy</h2>
+                        <p class="text-gray-600 mb-8 text-lg">
+                            Ready to take the next step in your career? Fill out the form to register for the upcoming semester. Our admissions team will contact you within 24 hours.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Call Us</h4>
+                                    <p class="text-gray-600">+252 61 5000000</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Email Us</h4>
+                                    <p class="text-gray-600">admissions@hanaqaad.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Side -->
+                    <div class="lg:w-1/2 w-full">
+                        <form id="enrollment-form" class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Enrollment Form</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+                                <input type="text" id="name" required class="w-full px-4 py-3 rounded border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" placeholder="John Doe">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Email Address</label>
+                                <input type="email" id="email" required class="w-full px-4 py-3 rounded border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" placeholder="john@example.com">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                                <input type="tel" id="phone" required class="w-full px-4 py-3 rounded border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" placeholder="+252 ...">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-medium mb-2">Select Course</label>
+                                <select id="course-select" class="w-full px-4 py-3 rounded border focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition bg-white">
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition transform active:scale-95">
+                                Submit Application
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-gray-900 text-white py-10">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <h2 class="text-2xl font-bold flex items-center gap-2">
+                            <i class="fas fa-graduation-cap text-blue-400"></i> HANAQAAD
+                        </h2>
+                        <p class="text-gray-400 mt-2 text-sm">Empowering the next generation.</p>
+                    </div>
+                    
+                    <!-- Admin Login moved to Footer -->
+                    <div class="mb-6 md:mb-0">
+                        <button onclick="openLoginModal()" class="text-sm bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition flex items-center gap-2">
+                            <i class="fas fa-user-shield"></i> Admin Login
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+                    &copy; 2023 Hanaqaad Academy. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="login-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-96 relative animate-fade-in-up">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Admin Access</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                    <input type="text" id="admin-user" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Username">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="admin-pass" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Password">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition">
+                    Login
+                </button>
+                <p id="login-error" class="text-red-500 text-xs text-center mt-3 hidden">Invalid username or password.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- STUDENT LOGIN MODAL -->
+    <div id="student-login-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-96 relative animate-fade-in-up">
+            <button onclick="closeStudentLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">Student Portal</h2>
+            <p class="text-center text-gray-500 text-sm mb-6">Enter your email to access your courses.</p>
+            
+            <form onsubmit="handleStudentLogin(event)">
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Registered Email</label>
+                    <input type="email" id="student-email-login" required class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="student@example.com">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition">
+                    Access Classroom
+                </button>
+                <p id="student-login-error" class="text-red-500 text-xs text-center mt-3 hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load JavaScript -->
+    <script src="Main.js"></script>
+</body>
+</html>
